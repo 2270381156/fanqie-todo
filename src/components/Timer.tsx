@@ -14,7 +14,7 @@ const MODE_COLORS = {
   longBreak: '#6B9BD2',
 }
 
-export function Timer() {
+export function Timer({ compact = false }: { compact?: boolean }) {
   const {
     mode,
     isRunning,
@@ -28,15 +28,71 @@ export function Timer() {
   } = useTimer()
   const { settings } = useSettingsStore()
 
-  const radius = 110
+  const radius = compact ? 70 : 110
+  const svgSize = compact ? 160 : 260
   const circumference = 2 * Math.PI * radius
   const offset = circumference - progress * circumference
+  const strokeWidth = compact ? 8 : 10
 
   const modeButtons: { key: 'work' | 'shortBreak' | 'longBreak'; label: string }[] = [
     { key: 'work', label: `专注 ${settings.workMinutes}分` },
     { key: 'shortBreak', label: `短休 ${settings.shortBreakMinutes}分` },
     { key: 'longBreak', label: `长休 ${settings.longBreakMinutes}分` },
   ]
+
+  const statusText = isRunning ? MODE_LABELS[mode] : '暂停中'
+
+  if (compact) {
+    return (
+      <div className="flex flex-col items-center gap-3">
+        <div className="relative">
+          <svg width={svgSize} height={svgSize} className="timer-ring">
+            <circle
+              cx={svgSize / 2}
+              cy={svgSize / 2}
+              r={radius}
+              className="timer-ring-bg"
+              strokeWidth={strokeWidth}
+            />
+            <circle
+              cx={svgSize / 2}
+              cy={svgSize / 2}
+              r={radius}
+              className="timer-ring-progress"
+              strokeWidth={strokeWidth}
+              stroke={MODE_COLORS[mode]}
+              strokeDasharray={circumference}
+              strokeDashoffset={offset}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <span className="text-2xl font-bold tracking-wider" style={{ color: MODE_COLORS[mode] }}>
+              {formatTime}
+            </span>
+            <span className="text-xs text-[#9B7B6B] mt-0.5 font-semibold">
+              {statusText}
+            </span>
+          </div>
+        </div>
+        <button
+          onClick={isRunning ? pause : start}
+          className="w-10 h-10 rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 active:scale-95"
+          style={{ backgroundColor: MODE_COLORS[mode] }}
+        >
+          {isRunning ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <polygon points="6,4 20,12 6,20" />
+            </svg>
+          )}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col items-center gap-6">
@@ -59,20 +115,20 @@ export function Timer() {
 
       {/* Timer ring */}
       <div className="relative">
-        <svg width="260" height="260" className="timer-ring">
+        <svg width={svgSize} height={svgSize} className="timer-ring">
           <circle
-            cx="130"
-            cy="130"
+            cx={svgSize / 2}
+            cy={svgSize / 2}
             r={radius}
             className="timer-ring-bg"
-            strokeWidth="10"
+            strokeWidth={strokeWidth}
           />
           <circle
-            cx="130"
-            cy="130"
+            cx={svgSize / 2}
+            cy={svgSize / 2}
             r={radius}
             className="timer-ring-progress"
-            strokeWidth="10"
+            strokeWidth={strokeWidth}
             stroke={MODE_COLORS[mode]}
             strokeDasharray={circumference}
             strokeDashoffset={offset}
@@ -83,7 +139,7 @@ export function Timer() {
             {formatTime}
           </span>
           <span className="text-sm text-[#9B7B6B] mt-1 font-semibold">
-            {MODE_LABELS[mode]}
+            {statusText}
           </span>
         </div>
       </div>

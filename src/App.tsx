@@ -8,6 +8,7 @@ import { Stats } from './components/Stats'
 import { Settings } from './components/Settings'
 import { WhiteNoisePanel } from './components/WhiteNoise'
 import { useWallpaperStore } from './stores/wallpaper'
+import { useWindowSize } from './hooks/useWindowSize'
 
 type Tab = 'timer' | 'stats' | 'settings'
 
@@ -26,6 +27,8 @@ function App() {
   const [isOnTop, setIsOnTop] = useState(false)
   const [isMini, setIsMini] = useState(false)
   const wallpaper = useWallpaperStore((s) => s.getCurrent())
+  const { width, height } = useWindowSize()
+  const isCompact = width < 360 || height < 450
 
   const toggleAlwaysOnTop = async () => {
     try {
@@ -59,8 +62,8 @@ function App() {
       } else {
         await win.setResizable(true)
         await win.setSizeConstraints({
-          minWidth: 360,
-          minHeight: 580,
+          minWidth: 300,
+          minHeight: 300,
         })
         await win.setSize(new LogicalSize(NORMAL_WIDTH, NORMAL_HEIGHT))
       }
@@ -178,41 +181,51 @@ function App() {
         </header>
 
         {/* Tab navigation */}
-        <nav className="flex justify-center px-4 pb-2 shrink-0">
-          <div className="flex gap-1 p-1 rounded-xl bg-white/30 backdrop-blur-sm border border-white/40">
-            {tabs.map((tab) => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                  activeTab === tab.key
-                    ? 'bg-white/70 text-[#6B4C3B] shadow-sm'
-                    : 'text-[#9B7B6B] hover:text-[#6B4C3B] hover:bg-white/20'
-                }`}
-              >
-                <span className="mr-1">{tab.icon}</span>
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </nav>
+        {!isCompact && (
+          <nav className="flex justify-center px-4 pb-2 shrink-0">
+            <div className="flex gap-1 p-1 rounded-xl bg-white/30 backdrop-blur-sm border border-white/40">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => setActiveTab(tab.key)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                    activeTab === tab.key
+                      ? 'bg-white/70 text-[#6B4C3B] shadow-sm'
+                      : 'text-[#9B7B6B] hover:text-[#6B4C3B] hover:bg-white/20'
+                  }`}
+                >
+                  <span className="mr-1">{tab.icon}</span>
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </nav>
+        )}
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto px-4 pb-4">
-          {activeTab === 'timer' && (
-            <div className="flex flex-col gap-4 fade-in">
-              <Timer />
-              <WhiteNoisePanel />
-              <div className="glass-card rounded-2xl p-4">
-                <h2 className="text-sm font-bold text-[#6B4C3B] mb-3 flex items-center gap-2">
-                  <span>📝</span> 今日任务
-                </h2>
-                <TaskList />
-              </div>
+          {isCompact ? (
+            <div className="flex flex-col items-center justify-center h-full fade-in">
+              <Timer compact />
             </div>
+          ) : (
+            <>
+              {activeTab === 'timer' && (
+                <div className="flex flex-col gap-4 fade-in">
+                  <Timer />
+                  <WhiteNoisePanel />
+                  <div className="glass-card rounded-2xl p-4">
+                    <h2 className="text-sm font-bold text-[#6B4C3B] mb-3 flex items-center gap-2">
+                      <span>📝</span> 今日任务
+                    </h2>
+                    <TaskList />
+                  </div>
+                </div>
+              )}
+              {activeTab === 'stats' && <Stats />}
+              {activeTab === 'settings' && <Settings />}
+            </>
           )}
-          {activeTab === 'stats' && <Stats />}
-          {activeTab === 'settings' && <Settings />}
         </main>
       </div>
     </div>

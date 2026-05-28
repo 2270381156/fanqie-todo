@@ -33,9 +33,9 @@ export function TaskList() {
         />
         <button
           onClick={handleAdd}
-          className="px-4 py-2.5 rounded-xl bg-[#E85D4A] text-white text-sm font-semibold hover:bg-[#D94F3D] transition-colors shadow-sm"
+          className="w-9 h-9 rounded-full bg-[#E85D4A] text-white text-lg font-bold hover:bg-[#D94F3D] transition-colors shadow-sm flex items-center justify-center flex-shrink-0"
         >
-          添加
+          +
         </button>
       </div>
 

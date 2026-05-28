@@ -65,6 +65,9 @@ export function MiniTimer({ onExpand }: MiniTimerProps) {
         >
           {formatTime}
         </span>
+        <span className="text-[10px] text-[#9B7B6B] font-semibold">
+          {isRunning ? '' : '暂停中'}
+        </span>
         <button
           onClick={isRunning ? pause : start}
           className="mt-1 px-2 py-0.5 rounded text-[10px] font-semibold transition-colors"
@@ -74,7 +77,7 @@ export function MiniTimer({ onExpand }: MiniTimerProps) {
           }}
           title={isRunning ? '暂停' : '开始'}
         >
-          {isRunning ? '⏸' : '▶'}
+          {isRunning ? '暂停' : '▶'}
         </button>
       </div>
     </div>
