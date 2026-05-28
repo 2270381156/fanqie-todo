@@ -151,6 +151,27 @@ export function Settings() {
         </div>
       )}
 
+      {/* Mini opacity */}
+      <div className="glass-card rounded-2xl p-4">
+        <h3 className="text-sm font-bold text-[#6B4C3B] mb-3">小窗透明度</h3>
+        <div className="flex items-center gap-3">
+          <span className="text-xs text-[#9B7B6B]">透明</span>
+          <input
+            type="range"
+            min="0.3"
+            max="1"
+            step="0.05"
+            value={settings.miniOpacity}
+            onChange={(e) => update({ miniOpacity: parseFloat(e.target.value) })}
+            className="flex-1 accent-[#6B9BD2] h-2 rounded-full appearance-none bg-[#F5EDE3]"
+          />
+          <span className="text-xs text-[#9B7B6B]">不透明</span>
+          <span className="text-xs font-bold text-[#6B4C3B] w-8 text-right">
+            {Math.round(settings.miniOpacity * 100)}%
+          </span>
+        </div>
+      </div>
+
       {/* Wallpaper */}
       <WallpaperPicker />
 

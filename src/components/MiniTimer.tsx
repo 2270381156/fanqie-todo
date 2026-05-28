@@ -1,5 +1,4 @@
 import { useTimer } from '../hooks/useTimer'
-import { useTimerStore } from '../stores/timer'
 import { useSettingsStore } from '../stores/settings'
 
 const MODE_COLORS = {
@@ -21,11 +20,15 @@ export function MiniTimer({ onExpand }: MiniTimerProps) {
   const offset = circumference - progress * circumference
 
   return (
-    <div className="flex flex-col items-center justify-center h-full gap-1 relative">
+    <div
+      data-tauri-drag-region
+      className="flex flex-col items-center justify-center h-full relative select-none"
+      style={{ opacity: settings.miniOpacity }}
+    >
       {/* Expand button */}
       <button
         onClick={onExpand}
-        className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center bg-[#6B4C3B]/60 text-white hover:bg-[#6B4C3B]/90 transition-colors z-10"
+        className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center bg-[#6B4C3B]/70 text-white hover:bg-[#6B4C3B] transition-colors z-10 shadow-sm"
         title="退出小窗"
       >
         <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -54,7 +57,7 @@ export function MiniTimer({ onExpand }: MiniTimerProps) {
         />
       </svg>
 
-      {/* Time display */}
+      {/* Time + play/pause */}
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <span
           className="text-2xl font-bold tracking-wide"
@@ -62,14 +65,18 @@ export function MiniTimer({ onExpand }: MiniTimerProps) {
         >
           {formatTime}
         </span>
+        <button
+          onClick={isRunning ? pause : start}
+          className="mt-1 px-2 py-0.5 rounded text-[10px] font-semibold transition-colors"
+          style={{
+            color: MODE_COLORS[mode],
+            backgroundColor: `${MODE_COLORS[mode]}18`,
+          }}
+          title={isRunning ? '暂停' : '开始'}
+        >
+          {isRunning ? '⏸' : '▶'}
+        </button>
       </div>
-
-      {/* Play/pause on click area */}
-      <button
-        onClick={isRunning ? pause : start}
-        className="absolute inset-0 z-5"
-        title={isRunning ? '暂停' : '开始'}
-      />
     </div>
   )
 }
