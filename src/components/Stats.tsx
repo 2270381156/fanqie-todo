@@ -1,5 +1,6 @@
 import { useStatsStore } from '../stores/stats'
 import { format } from 'date-fns'
+import { Icon } from './icons'
 
 export function Stats() {
   const { totalPomodoros, totalFocusMinutes, currentStreak, getTodayStats, getWeekStats } =
@@ -20,10 +21,10 @@ export function Stats() {
   })
 
   const statCards = [
-    { label: '今日番茄', value: today.pomodoros, emoji: '🍅' },
-    { label: '今日专注', value: `${today.focusMinutes}分`, emoji: '⏱️' },
-    { label: '连续天数', value: currentStreak, emoji: '🔥' },
-    { label: '总计番茄', value: totalPomodoros, emoji: '🏆' },
+    { label: '今日番茄', value: today.pomodoros, icon: 'tomato' as const, color: '#E85D4A' },
+    { label: '今日专注', value: `${today.focusMinutes}分`, icon: 'clock' as const, color: '#8FB996' },
+    { label: '连续天数', value: currentStreak, icon: 'fire' as const, color: '#F0877A' },
+    { label: '总计番茄', value: totalPomodoros, icon: 'trophy' as const, color: '#6B9BD2' },
   ]
 
   return (
@@ -33,9 +34,11 @@ export function Stats() {
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="glass-card rounded-2xl p-4 text-center"
+            className="glass-card rounded-2xl p-4 text-center hover:shadow-lg transition-all duration-200 hover:scale-[1.02]"
           >
-            <div className="text-2xl mb-1">{card.emoji}</div>
+            <div className="mb-2 flex items-center justify-center">
+              <Icon name={card.icon} size={28} color={card.color} />
+            </div>
             <div className="text-2xl font-bold text-[#6B4C3B]">{card.value}</div>
             <div className="text-xs text-[#9B7B6B] mt-1">{card.label}</div>
           </div>
@@ -44,7 +47,15 @@ export function Stats() {
 
       {/* Weekly chart */}
       <div className="glass-card rounded-2xl p-4">
-        <h3 className="text-sm font-bold text-[#6B4C3B] mb-4">本周专注</h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-sm font-bold text-[#6B4C3B] flex items-center gap-2">
+            <Icon name="stats" size={16} color="#6B4C3B" />
+            <span>本周专注</span>
+          </h3>
+          <span className="text-xs text-[#9B7B6B]">
+            本周 {week.reduce((sum, d) => sum + d.pomodoros, 0)} 个番茄
+          </span>
+        </div>
         <div className="flex items-end justify-between gap-2 h-32">
           {weekDays.map((day) => (
             <div key={day.date} className="flex flex-col items-center gap-1.5 flex-1">
@@ -53,12 +64,13 @@ export function Stats() {
               </span>
               <div className="w-full flex items-end" style={{ height: '80px' }}>
                 <div
-                  className="w-full rounded-t-lg transition-all duration-500"
+                  className="w-full rounded-t-lg transition-all duration-500 hover:opacity-80 cursor-pointer"
                   style={{
                     height: `${day.pomodoros > 0 ? (day.pomodoros / maxPomodoros) * 100 : 4}%`,
                     backgroundColor: day.isToday ? '#E85D4A' : '#F5EDE3',
                     minHeight: '4px',
                   }}
+                  title={`${day.pomodoros} 个番茄`}
                 />
               </div>
               <span

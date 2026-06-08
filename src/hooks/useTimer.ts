@@ -3,6 +3,7 @@ import { useTimerStore, type TimerMode } from '../stores/timer'
 import { useSettingsStore } from '../stores/settings'
 import { useStatsStore } from '../stores/stats'
 import { useTasksStore } from '../stores/tasks'
+import { toast } from '../components/Toast'
 
 export function useTimer() {
   const timer = useTimerStore()
@@ -83,14 +84,19 @@ export function useTimer() {
         incrementPomodoro(activeTask.id)
       }
 
+      // Show success notification
+      toast.success('🍅 专注时间完成！休息一下吧', 5000)
+
       // Determine next mode
       const completed = useTimerStore.getState().completedPomodoros
       if (completed % settings.longBreakInterval === 0) {
         const duration = getDuration('longBreak')
         timer.setMode('longBreak', duration)
+        toast.info(`开始长休息 ${settings.longBreakMinutes} 分钟`, 3000)
       } else {
         const duration = getDuration('shortBreak')
         timer.setMode('shortBreak', duration)
+        toast.info(`开始短休息 ${settings.shortBreakMinutes} 分钟`, 3000)
       }
 
       if (settings.autoStartBreak) {
@@ -101,11 +107,13 @@ export function useTimer() {
       const duration = getDuration('work')
       timer.setMode('work', duration)
 
+      toast.success('✨ 休息完成！准备好专注了吗？', 4000)
+
       if (settings.autoStartWork) {
         setTimeout(() => timer.start(), 500)
       }
     }
-  }, [settings, tasks, playSound, getDuration, recordPomodoro, incrementPomodoro])
+  }, [settings, tasks, playSound, getDuration, recordPomodoro, incrementPomodoro, timer])
 
   // Switch mode manually
   const switchMode = useCallback(

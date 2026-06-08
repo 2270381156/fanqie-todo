@@ -1,5 +1,6 @@
 import { useTimer } from '../hooks/useTimer'
 import { useSettingsStore } from '../stores/settings'
+import { Icon } from './icons'
 
 const MODE_COLORS = {
   work: '#E85D4A',
@@ -27,13 +28,13 @@ export function MiniTimer({ onExpand }: MiniTimerProps) {
     >
       {/* Expand button */}
       <button
+        type="button"
         onClick={onExpand}
-        className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center bg-[#6B4C3B]/70 text-white hover:bg-[#6B4C3B] transition-colors z-10 shadow-sm"
+        className="absolute top-2 right-2 w-6 h-6 rounded-full flex items-center justify-center bg-[#6B4C3B]/70 text-white hover:bg-[#6B4C3B] transition-all duration-200 hover:scale-110 active:scale-95 z-10 shadow-sm"
         title="退出小窗"
+        aria-label="退出小窗模式"
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z" />
-        </svg>
+        <Icon name="expand" size={12} color="white" />
       </button>
 
       {/* Mini timer ring */}
@@ -69,13 +70,15 @@ export function MiniTimer({ onExpand }: MiniTimerProps) {
           {isRunning ? '' : '暂停中'}
         </span>
         <button
+          type="button"
           onClick={isRunning ? pause : start}
-          className="mt-1 px-2 py-0.5 rounded text-[10px] font-semibold transition-colors"
+          className="mt-1 px-2 py-0.5 rounded text-[10px] font-semibold transition-all duration-200 hover:scale-105 active:scale-95"
           style={{
             color: MODE_COLORS[mode],
             backgroundColor: `${MODE_COLORS[mode]}18`,
           }}
           title={isRunning ? '暂停' : '开始'}
+          aria-label={isRunning ? '暂停计时' : '开始计时'}
         >
           {isRunning ? '暂停' : '▶'}
         </button>

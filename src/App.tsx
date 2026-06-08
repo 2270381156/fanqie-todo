@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { Window } from '@tauri-apps/api/window'
 import { LogicalSize } from '@tauri-apps/api/dpi'
 import { Timer } from './components/Timer'
@@ -7,15 +7,17 @@ import { TaskList } from './components/TaskList'
 import { Stats } from './components/Stats'
 import { Settings } from './components/Settings'
 import { WhiteNoisePanel } from './components/WhiteNoise'
+import { ToastContainer } from './components/Toast'
 import { useWallpaperStore } from './stores/wallpaper'
 import { useWindowSize } from './hooks/useWindowSize'
+import { Icon } from './components/icons'
 
 type Tab = 'timer' | 'stats' | 'settings'
 
 const tabs: { key: Tab; label: string; icon: string }[] = [
-  { key: 'timer', label: '番茄钟', icon: '🍅' },
-  { key: 'stats', label: '统计', icon: '📊' },
-  { key: 'settings', label: '设置', icon: '⚙️' },
+  { key: 'timer', label: '番茄钟', icon: 'tomato' },
+  { key: 'stats', label: '统计', icon: 'stats' },
+  { key: 'settings', label: '设置', icon: 'settings' },
 ]
 
 const MINI_SIZE = 160
@@ -90,6 +92,39 @@ function App() {
     }
   }
 
+  // 键盘快捷键
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Ctrl/Cmd + 数字切换标签
+      if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+        if (e.key === '1') {
+          setActiveTab('timer')
+          e.preventDefault()
+        } else if (e.key === '2') {
+          setActiveTab('stats')
+          e.preventDefault()
+        } else if (e.key === '3') {
+          setActiveTab('settings')
+          e.preventDefault()
+        } else if (e.key === 'm') {
+          toggleMiniMode()
+          e.preventDefault()
+        } else if (e.key === 't') {
+          toggleAlwaysOnTop()
+          e.preventDefault()
+        }
+      }
+      // 空格键播放/暂停
+      if (e.code === 'Space' && activeTab === 'timer') {
+        e.preventDefault()
+        // 将由 Timer 组件处理
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  }, [activeTab, toggleMiniMode])
+
   // Mini mode: compact square with just the timer
   if (isMini) {
     return (
@@ -107,6 +142,7 @@ function App() {
 
   return (
     <div className="relative flex flex-col h-screen rounded-3xl overflow-hidden">
+      <ToastContainer />
       {/* Wallpaper background */}
       <div
         className="absolute inset-0 transition-all duration-700"
@@ -129,53 +165,51 @@ function App() {
           className="flex items-center justify-between px-4 pt-3 pb-1 shrink-0"
         >
           <div className="flex items-center gap-2" data-tauri-drag-region>
-            <span className="text-lg float">🍅</span>
+            <div className="float">
+              <Icon name="tomato" size={20} color="#E85D4A" />
+            </div>
             <h1 className="text-sm font-bold text-[#6B4C3B]/80">番茄钟</h1>
           </div>
 
           <div className="flex items-center gap-1">
             <button
+              type="button"
               onClick={toggleMiniMode}
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B7B6B] hover:bg-white/30 transition-colors"
-              title="小窗模式"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B7B6B] hover:bg-white/30 transition-all duration-200 hover:scale-105 active:scale-95"
+              title="小窗模式 (Ctrl+M)"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M5 5h6v2H7v4H5V5zm14 0v6h-2V7h-4V5h6zM5 19v-6h2v4h4v2H5zm14-4v4h-4v2h6v-6h-2z" />
-              </svg>
+              <Icon name="compress" size={14} />
             </button>
 
             <button
+              type="button"
               onClick={toggleAlwaysOnTop}
-              className={`w-7 h-7 rounded-lg flex items-center justify-center text-xs transition-all duration-200 ${
+              className={`w-7 h-7 rounded-lg flex items-center justify-center transition-all duration-200 hover:scale-105 active:scale-95 ${
                 isOnTop
                   ? 'bg-[#E85D4A]/20 text-[#E85D4A]'
                   : 'text-[#9B7B6B] hover:bg-white/30'
               }`}
-              title={isOnTop ? '取消置顶' : '窗口置顶'}
+              title={isOnTop ? '取消置顶 (Ctrl+T)' : '窗口置顶 (Ctrl+T)'}
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M16 12V4h1V2H7v2h1v8l-2 2v2h5.2v6h1.6v-6H18v-2l-2-2z" />
-              </svg>
+              <Icon name="pin" size={14} />
             </button>
 
             <button
+              type="button"
               onClick={handleMinimize}
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B7B6B] hover:bg-white/30 transition-colors"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B7B6B] hover:bg-white/30 transition-all duration-200 hover:scale-105 active:scale-95"
               title="最小化"
             >
-              <svg width="12" height="12" viewBox="0 0 12 2" fill="currentColor">
-                <rect width="12" height="2" rx="1" />
-              </svg>
+              <Icon name="minimize" size={14} />
             </button>
 
             <button
+              type="button"
               onClick={handleClose}
-              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B7B6B] hover:bg-[#E85D4A]/20 hover:text-[#E85D4A] transition-colors"
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B7B6B] hover:bg-[#E85D4A]/20 hover:text-[#E85D4A] transition-all duration-200 hover:scale-105 active:scale-95"
               title="最小化到托盘"
             >
-              <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
-                <path d="M1 0L0 1l4 4-4 4 1 1 4-4 4 4 1-1-4-4 4-4-1-1-4 4z" />
-              </svg>
+              <Icon name="close" size={12} />
             </button>
           </div>
         </header>
@@ -184,18 +218,20 @@ function App() {
         {!isCompact && (
           <nav className="flex justify-center px-4 pb-2 shrink-0">
             <div className="flex gap-1 p-1 rounded-xl bg-white/30 backdrop-blur-sm border border-white/40">
-              {tabs.map((tab) => (
+              {tabs.map((tab, index) => (
                 <button
+                  type="button"
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key)}
-                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 flex items-center gap-1.5 hover:scale-105 active:scale-95 ${
                     activeTab === tab.key
                       ? 'bg-white/70 text-[#6B4C3B] shadow-sm'
                       : 'text-[#9B7B6B] hover:text-[#6B4C3B] hover:bg-white/20'
                   }`}
+                  title={`${tab.label} (Ctrl+${index + 1})`}
                 >
-                  <span className="mr-1">{tab.icon}</span>
-                  {tab.label}
+                  <Icon name={tab.icon} size={14} />
+                  <span>{tab.label}</span>
                 </button>
               ))}
             </div>
@@ -216,7 +252,8 @@ function App() {
                   <WhiteNoisePanel />
                   <div className="glass-card rounded-2xl p-4">
                     <h2 className="text-sm font-bold text-[#6B4C3B] mb-3 flex items-center gap-2">
-                      <span>📝</span> 今日任务
+                      <Icon name="task" size={16} />
+                      <span>今日任务</span>
                     </h2>
                     <TaskList />
                   </div>

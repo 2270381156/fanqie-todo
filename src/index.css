@@ -49,6 +49,13 @@ body {
   box-shadow:
     0 4px 24px rgba(107, 76, 59, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.glass-card:hover {
+  box-shadow:
+    0 8px 32px rgba(107, 76, 59, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Timer ring */
@@ -175,4 +182,36 @@ input[type="range"]::-webkit-slider-thumb {
   filter: blur(60px);
   opacity: 0.4;
   pointer-events: none;
+  animation: blob-float 20s ease-in-out infinite;
+}
+
+@keyframes blob-float {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(10px, -10px) scale(1.05);
+  }
+  66% {
+    transform: translate(-10px, 10px) scale(0.95);
+  }
+}
+
+/* Smooth transitions for all interactive elements */
+button, input, select, textarea {
+  transition: all 0.2s ease;
+}
+
+/* Focus visible styles */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #E85D4A;
+  outline-offset: 2px;
+}
+
+/* Selection color */
+::selection {
+  background: rgba(232, 93, 74, 0.3);
+  color: #6B4C3B;
 }

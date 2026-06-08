@@ -1,25 +1,30 @@
 import { useWhiteNoise, type NoiseType } from '../hooks/useWhiteNoise'
+import { Icon } from './icons'
 
 export function WhiteNoisePanel() {
   const { activeNoise, volume, toggle, setVolume, noiseTypes, getLabel, getIcon } =
     useWhiteNoise()
 
   return (
-    <div className="backdrop-blur-xl bg-white/40 rounded-2xl p-4 border border-white/50 shadow-lg">
+    <div className="backdrop-blur-xl bg-white/40 rounded-2xl p-4 border border-white/50 shadow-lg hover:shadow-xl transition-all duration-200">
       <h3 className="text-sm font-bold text-[#6B4C3B] mb-3 flex items-center gap-2">
-        <span>🎧</span> 白噪音
+        <Icon name="music" size={16} />
+        <span>白噪音</span>
       </h3>
 
       <div className="grid grid-cols-3 gap-2 mb-3">
         {noiseTypes.map((type) => (
           <button
+            type="button"
             key={type}
             onClick={() => toggle(type as NoiseType)}
-            className={`flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl text-xs font-semibold transition-all duration-200 ${
+            className={`flex flex-col items-center gap-1 py-2.5 px-2 rounded-xl text-xs font-semibold transition-all duration-200 hover:scale-105 active:scale-95 ${
               activeNoise === type
                 ? 'bg-[#E85D4A]/20 text-[#E85D4A] border border-[#E85D4A]/30 scale-105 shadow-md'
                 : 'bg-white/50 text-[#6B4C3B] border border-transparent hover:bg-white/70 hover:shadow-sm'
             }`}
+            title={getLabel(type as NoiseType)}
+            aria-label={`${getLabel(type as NoiseType)} ${activeNoise === type ? '（播放中）' : ''}`}
           >
             <span className="text-lg">{getIcon(type as NoiseType)}</span>
             <span>{getLabel(type as NoiseType)}</span>
@@ -38,6 +43,8 @@ export function WhiteNoisePanel() {
             value={volume}
             onChange={(e) => setVolume(parseFloat(e.target.value))}
             className="flex-1 accent-[#E85D4A] h-1.5 rounded-full appearance-none bg-white/50"
+            aria-label="白噪音音量"
+            title="调整白噪音音量"
           />
           <span className="text-xs text-[#6B4C3B] font-semibold w-8 text-right">
             {Math.round((volume / 0.8) * 100)}%

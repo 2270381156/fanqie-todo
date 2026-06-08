@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTasksStore } from '../stores/tasks'
+import { Icon } from './icons'
 
 export function TaskList() {
   const { tasks, addTask, toggleTask, deleteTask, clearCompleted } = useTasksStore()
@@ -32,10 +33,12 @@ export function TaskList() {
           className="flex-1 px-4 py-2.5 rounded-xl bg-white/40 backdrop-blur-sm border-2 border-white/50 text-[#6B4C3B] placeholder-[#9B7B6B] text-sm focus:outline-none focus:border-[#E85D4A]/50 transition-colors"
         />
         <button
+          type="button"
           onClick={handleAdd}
-          className="w-9 h-9 rounded-full bg-[#E85D4A] text-white text-lg font-bold hover:bg-[#D94F3D] transition-colors shadow-sm flex items-center justify-center flex-shrink-0"
+          className="w-9 h-9 rounded-full bg-[#E85D4A] text-white hover:bg-[#D94F3D] transition-all duration-200 shadow-sm hover:shadow-md hover:scale-105 active:scale-95 flex items-center justify-center flex-shrink-0"
+          title="添加任务"
         >
-          +
+          <Icon name="add" size={20} color="white" />
         </button>
       </div>
 
@@ -50,25 +53,30 @@ export function TaskList() {
         {activeTasks.map((task) => (
           <div
             key={task.id}
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-colors group fade-in"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/30 backdrop-blur-sm hover:bg-white/50 transition-all duration-200 hover:shadow-sm hover:scale-[1.01] group fade-in"
           >
             <button
+              type="button"
               onClick={() => toggleTask(task.id)}
-              className="w-5 h-5 rounded-full border-2 border-[#9B7B6B] hover:border-[#E85D4A] transition-colors flex-shrink-0"
+              className="w-5 h-5 rounded-full border-2 border-[#9B7B6B] hover:border-[#E85D4A] transition-all duration-200 flex-shrink-0 hover:scale-110"
+              title="完成任务"
+              aria-label="完成任务"
             />
-            <span className="flex-1 text-sm text-[#6B4C3B]">{task.text}</span>
+            <span className="flex-1 text-sm text-[#6B4C3B] break-words">{task.text}</span>
             {task.pomodoros > 0 && (
-              <span className="text-xs text-[#9B7B6B] flex items-center gap-0.5">
-                🍅 {task.pomodoros}
+              <span className="text-xs text-[#9B7B6B] flex items-center gap-1 bg-[#E85D4A]/10 px-2 py-0.5 rounded-full flex-shrink-0">
+                <Icon name="tomato" size={12} color="#E85D4A" />
+                <span className="font-semibold">{task.pomodoros}</span>
               </span>
             )}
             <button
+              type="button"
               onClick={() => deleteTask(task.id)}
-              className="opacity-0 group-hover:opacity-100 text-[#9B7B6B] hover:text-[#E85D4A] transition-all"
+              className="opacity-0 group-hover:opacity-100 text-[#9B7B6B] hover:text-[#E85D4A] transition-all duration-200 hover:scale-110 flex-shrink-0"
+              title="删除任务"
+              aria-label="删除任务"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-              </svg>
+              <Icon name="delete" size={14} />
             </button>
           </div>
         ))}
@@ -80,8 +88,10 @@ export function TaskList() {
                 已完成 ({completedTasks.length})
               </span>
               <button
+                type="button"
                 onClick={clearCompleted}
-                className="text-xs text-[#9B7B6B] hover:text-[#E85D4A] transition-colors"
+                className="text-xs text-[#9B7B6B] hover:text-[#E85D4A] transition-all duration-200 hover:scale-105"
+                title="清除已完成任务"
               >
                 清除
               </button>
@@ -89,21 +99,25 @@ export function TaskList() {
             {completedTasks.map((task) => (
               <div
                 key={task.id}
-                className="flex items-center gap-3 px-3 py-2 rounded-xl opacity-60"
+                className="flex items-center gap-3 px-3 py-2 rounded-xl opacity-60 hover:opacity-80 transition-all duration-200 group"
               >
                 <button
+                  type="button"
                   onClick={() => toggleTask(task.id)}
-                  className="w-5 h-5 rounded-full bg-[#8FB996] border-2 border-[#8FB996] flex-shrink-0 flex items-center justify-center"
+                  className="w-5 h-5 rounded-full bg-[#8FB996] border-2 border-[#8FB996] flex-shrink-0 flex items-center justify-center hover:scale-110 transition-transform duration-200"
+                  title="恢复任务"
+                  aria-label="恢复任务"
                 >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="white">
-                    <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
-                  </svg>
+                  <Icon name="check" size={12} color="white" />
                 </button>
-                <span className="flex-1 text-sm text-[#9B7B6B] line-through">
+                <span className="flex-1 text-sm text-[#9B7B6B] line-through break-words">
                   {task.text}
                 </span>
                 {task.pomodoros > 0 && (
-                  <span className="text-xs text-[#9B7B6B]">🍅 {task.pomodoros}</span>
+                  <span className="text-xs text-[#9B7B6B] flex items-center gap-1 flex-shrink-0">
+                    <Icon name="tomato" size={12} color="#9B7B6B" />
+                    <span>{task.pomodoros}</span>
+                  </span>
                 )}
               </div>
             ))}

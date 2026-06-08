@@ -1,5 +1,7 @@
 import { useSettingsStore } from '../stores/settings'
 import { WallpaperPicker } from './WallpaperPicker'
+import { DataManagement } from './DataManagement'
+import { Icon } from './icons'
 
 export function Settings() {
   const { settings, update } = useSettingsStore()
@@ -66,7 +68,13 @@ export function Settings() {
     <div className="flex flex-col gap-5 fade-in">
       {sections.map((section) => (
         <div key={section.title} className="glass-card rounded-2xl p-4">
-          <h3 className="text-sm font-bold text-[#6B4C3B] mb-3">{section.title}</h3>
+          <h3 className="text-sm font-bold text-[#6B4C3B] mb-3 flex items-center gap-2">
+            <Icon
+              name={section.title === '时间设置' ? 'clock' : section.title === '自动控制' ? 'settings' : 'volume'}
+              size={16}
+            />
+            <span>{section.title}</span>
+          </h3>
           <div className="flex flex-col gap-3">
             {section.items.map((item) => {
               const value = settings[item.key]
@@ -76,10 +84,12 @@ export function Settings() {
                   <div key={item.key} className="flex items-center justify-between">
                     <span className="text-sm text-[#6B4C3B]">{item.label}</span>
                     <button
+                      type="button"
                       onClick={() => update({ [item.key]: !value })}
-                      className={`w-11 h-6 rounded-full transition-colors duration-200 relative ${
+                      className={`w-11 h-6 rounded-full transition-all duration-200 relative hover:scale-105 ${
                         value ? 'bg-[#8FB996]' : 'bg-white/40 backdrop-blur-sm border border-white/50'
                       }`}
+                      aria-label={`${item.label}: ${value ? '开启' : '关闭'}`}
                     >
                       <div
                         className={`w-5 h-5 bg-white rounded-full shadow-sm absolute top-0.5 transition-transform duration-200 ${
@@ -97,11 +107,13 @@ export function Settings() {
                     <span className="text-sm text-[#6B4C3B]">{item.label}</span>
                     <div className="flex items-center gap-2">
                       <button
+                        type="button"
                         onClick={() => {
                           const newVal = Math.max(item.min!, value - 1)
                           update({ [item.key]: newVal })
                         }}
-                        className="w-7 h-7 rounded-lg bg-white/40 backdrop-blur-sm border border-white/50 text-[#6B4C3B] hover:bg-white/60 transition-colors flex items-center justify-center text-sm font-bold"
+                        className="w-7 h-7 rounded-lg bg-white/40 backdrop-blur-sm border border-white/50 text-[#6B4C3B] hover:bg-white/60 transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center text-sm font-bold"
+                        aria-label="减少"
                       >
                         -
                       </button>
@@ -109,11 +121,13 @@ export function Settings() {
                         {value}
                       </span>
                       <button
+                        type="button"
                         onClick={() => {
                           const newVal = Math.min(item.max!, value + 1)
                           update({ [item.key]: newVal })
                         }}
-                        className="w-7 h-7 rounded-lg bg-white/40 backdrop-blur-sm border border-white/50 text-[#6B4C3B] hover:bg-white/60 transition-colors flex items-center justify-center text-sm font-bold"
+                        className="w-7 h-7 rounded-lg bg-white/40 backdrop-blur-sm border border-white/50 text-[#6B4C3B] hover:bg-white/60 transition-all duration-200 hover:scale-105 active:scale-95 flex items-center justify-center text-sm font-bold"
+                        aria-label="增加"
                       >
                         +
                       </button>
@@ -134,7 +148,10 @@ export function Settings() {
       {/* Volume */}
       {settings.soundEnabled && (
         <div className="glass-card rounded-2xl p-4">
-          <h3 className="text-sm font-bold text-[#6B4C3B] mb-3">音量</h3>
+          <h3 className="text-sm font-bold text-[#6B4C3B] mb-3 flex items-center gap-2">
+            <Icon name="volume" size={16} />
+            <span>音量</span>
+          </h3>
           <div className="flex items-center gap-3">
             <span className="text-sm">🔈</span>
             <input
@@ -145,6 +162,8 @@ export function Settings() {
               value={settings.volume}
               onChange={(e) => update({ volume: parseFloat(e.target.value) })}
               className="flex-1 accent-[#E85D4A] h-2 rounded-full appearance-none bg-[#F5EDE3]"
+              aria-label="音量"
+              title="调整提示音音量"
             />
             <span className="text-sm">🔊</span>
           </div>
@@ -164,6 +183,8 @@ export function Settings() {
             value={settings.miniOpacity}
             onChange={(e) => update({ miniOpacity: parseFloat(e.target.value) })}
             className="flex-1 accent-[#6B9BD2] h-2 rounded-full appearance-none bg-[#F5EDE3]"
+            aria-label="小窗透明度"
+            title="调整小窗透明度"
           />
           <span className="text-xs text-[#9B7B6B]">不透明</span>
           <span className="text-xs font-bold text-[#6B4C3B] w-8 text-right">
@@ -175,9 +196,23 @@ export function Settings() {
       {/* Wallpaper */}
       <WallpaperPicker />
 
+      {/* Data Management */}
+      <DataManagement />
+
       {/* About */}
-      <div className="text-center text-xs text-[#9B7B6B] py-2">
-        番茄钟 v0.1.0 · 用专注创造价值 🍅
+      <div className="text-center py-3">
+        <div className="flex items-center justify-center gap-2 mb-2">
+          <Icon name="tomato" size={20} color="#E85D4A" />
+          <span className="text-sm font-bold text-[#6B4C3B]">番茄钟</span>
+        </div>
+        <div className="text-xs text-[#9B7B6B] space-y-1">
+          <div>v0.1.0</div>
+          <div className="flex items-center justify-center gap-2">
+            <Icon name="keyboard" size={12} color="#9B7B6B" />
+            <span>快捷键: Ctrl+1/2/3 切换标签</span>
+          </div>
+          <div>用专注创造价值 🍅</div>
+        </div>
       </div>
     </div>
   )
